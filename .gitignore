@@ -1,0 +1,14 @@
+# Ambiente e file di sistema
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+
+# Chiavi API: MAI su GitHub (su Streamlit Cloud vanno in Settings → Secrets)
+.streamlit/secrets.toml
+
+# File grandi, rigenerabili con gli script in codice/ (non servono all'app online)
+dati_preparati/frasi_bce_tutte.csv
+dati_grezzi/ecb_speeches_all.csv
+modello/cache/

@@ -1,0 +1,45 @@
+PROVA: UN LLM (Claude) ETICHETTA ALLA CIECA IL TEST WCB 2023–2024 – 13/11/2026
+
+Cosa è stato fatto
+- Le 244 frasi di dati_bce_wcb/frasi_bce_wcb_test.csv, mescolate, sono state lette SOLO come testo (senza
+  etichette, date, oratori) ed etichettate falco / colomba / neutrale con la guida BCE degli autori di WCB
+  (dati_bce_wcb/originali/guida_annotazione/stance.tex). Poi le etichette sono state confrontate con quelle
+  degli esperti WCB.
+- 1 frase (W090) è stata esclusa: la sua etichetta era già comparsa in un controllo precedente. Restano 243.
+- Limite: i dati WCB sono pubblici dal 2025 e potrebbero essere nei dati di addestramento del modello;
+  in quel caso il risultato sarebbe ottimistico.
+- Le etichette sono state date a mano in una conversazione, non con un programma ripetibile: un'altra
+  esecuzione (o un'API) potrebbe dare risultati un po' diversi.
+
+Risultati (243 frasi)
+  Accordo con gli esperti   76,1%
+  F1 pesato                 0,759   (IC 95% bootstrap 0,705 – 0,812)
+  F1 macro                  0,765
+  Kappa di Cohen            0,641   (IC 95% 0,56 – 0,72)
+  F1 per classe             falco 0,77 · colomba 0,81 · neutrale 0,72
+
+  Matrice di confusione (righe = esperti, colonne = LLM)
+                     falco  colomba  neutrale
+    falco               65        4        10
+    colomba              4       57         7
+    neutrale            21       12        63
+
+Riferimenti: nel paper WCB, sui resoconti BCE (divisione casuale), RoBERTa-large addestrato 0,755 e GPT-4.1
+senza addestramento 0,66 di F1 pesato. Controllo TF-IDF + regressione logistica sullo stesso test: A 0,54, B 0,53.
+
+Dove l'LLM sbaglia
+- L'errore principale: 33 frasi che gli esperti considerano NEUTRALI sono state etichettate falco (21) o
+  colomba (12). L'LLM legge implicazioni indirette (es. "risks remaining to the upside", "too early to be
+  confident", "real estate transactions picking up") dove gli esperti vedono descrizione senza direzione.
+- Gli esperti non applicano alla lettera alcune righe della guida (es. domanda di prestiti in calo = colomba,
+  M3 in aumento = falco, mentre la tabella della guida dice il contrario).
+- Alcune etichette degli esperti sono discutibili (es. "increased confidence that inflation was on track to
+  decline to 2%" = falco): anche il riferimento ha un po' di rumore.
+
+Conclusione
+Kappa 0,64 = accordo "buono" ma sotto la soglia di 0,70 fissata prima della prova. Un'etichetta su quattro
+dell'LLM non coincide con quella degli esperti: troppo rumore per usare le etichette dell'LLM come riferimento
+per confrontare A e B sui discorsi (le differenze tra modelli attese sono di pochi centesimi di F1).
+Il risultato è invece utilizzabile come esito dell'approccio C (LLM senza addestramento) sul test WCB.
+
+File: confronto_llm_esperti.csv (frase, etichetta esperti, etichetta LLM, accordo).

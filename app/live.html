@@ -1,0 +1,483 @@
+<!-- Pannello "in tempo reale" dell'analizzatore di discorsi (app/app.py, funzione live_html).
+     I segnaposto __NOME__ vengono sostituiti da Python: dati delle frasi, verdetto finale, colori del tema. -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --eu: __BLU_UE__; --abisso: __ABISSO__; --oro: __ORO__; --oro-scuro: __ORO_SCURO__; --ink: __INK__; --ink-2: __INK2__;
+  --carta: __CARTA__; --bordo: __BORDO__; --falco: __FALCO__; --colomba: __COLOMBA__; --neutrale: __NEUTRALE__;
+  --nonril: __NONRIL__; --falco-chiaro: #ff8a7a; --colomba-chiaro: #7cc8f0;
+  --ease: cubic-bezier(.2,.8,.2,1); --molla: cubic-bezier(.3,1.35,.5,1);
+  --f-titoli: 'Bricolage Grotesque', 'IBM Plex Sans', sans-serif;
+}
+* {box-sizing: border-box}
+body {margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  color: var(--ink); background: transparent}
+button, input {font-family: inherit}
+:focus-visible {outline: 2px solid var(--oro); outline-offset: 2px}
+
+/* ------------------------------------------------ console scura: video (o frase) + strumenti */
+.console {position: relative; overflow: hidden; border-radius: 20px; color: #fff; padding: 16px;
+  background: radial-gradient(60% 90% at 90% 0%, rgba(0,51,153,.9), rgba(0,51,153,0) 70%), var(--abisso);
+  box-shadow: 0 18px 40px -20px rgba(0,18,51,.6)}
+.scena {display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; align-items: stretch}
+.media {display: flex; flex-direction: column; gap: 12px; min-width: 0}
+.video {position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000}
+.video iframe, .video #player {position: absolute; inset: 0; width: 100%; height: 100%}
+
+/* didascalia dal vivo: la frase che si sta ascoltando */
+.dida {position: relative; border-radius: 14px; padding: 13px 16px 14px; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.09); min-height: 112px; transition: background .4s, border-color .4s}
+.dida::before {content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 3px;
+  background: var(--c, transparent); transition: background .4s}
+.dida .riga1 {display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: #9fb0d6}
+.dida .testo {margin-top: 8px; font-size: 16px; line-height: 1.55; color: #eef2ff}
+.dida.grande {flex: 1; min-height: 300px; padding: 22px 26px; display: flex; flex-direction: column}
+.dida.grande .testo {font-family: var(--f-titoli); font-size: clamp(19px, 2.4vw, 27px); line-height: 1.35;
+  letter-spacing: -0.01em; font-weight: 600; margin-top: 14px; flex: 1}
+.dida .vuoto {color: #8fa0c8; font-size: 15px}
+.parola {display: inline-block; white-space: pre; animation: parola .45s var(--ease) both}
+@keyframes parola {from {opacity: 0; transform: translateY(7px); filter: blur(3px)} to {opacity: 1; transform: none; filter: none}}
+.dida.nonpm .testo {color: #8fa0c8}
+.triade {display: flex; height: 5px; border-radius: 999px; overflow: hidden; width: 140px; gap: 2px; background: rgba(255,255,255,.06)}
+.triade i {display: block; height: 100%; transition: width .6s var(--ease)}
+.pill {display: inline-block; color: #fff; border-radius: 999px; padding: 1px 9px; font-size: 11px; font-weight: 700}
+
+/* strumenti */
+.strumenti {display: flex; flex-direction: column; gap: 10px; min-width: 0}
+.testa {display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600}
+.testa .orologio {margin-left: auto; color: #9fb0d6; font-weight: 500}
+.vivo {width: 8px; height: 8px; border-radius: 50%; background: var(--falco); box-shadow: 0 0 0 0 rgba(210,64,47,.6)}
+.in-onda .vivo {animation: pulsa 1.6s infinite}
+.in-pausa .vivo {background: #8fa0c8}
+@keyframes pulsa {70% {box-shadow: 0 0 0 8px rgba(210,64,47,0)} 100% {box-shadow: 0 0 0 0 rgba(210,64,47,0)}}
+.quadro {position: relative}
+.quadro svg {width: 100%; display: block}
+#ago {transform-box: view-box; transform-origin: 150px 150px; transform: rotate(0deg);
+  transition: transform 1s var(--molla)}
+.st {transform-box: fill-box; transform-origin: center; transition: transform .5s var(--molla), fill .5s}
+.st.acceso {transform: scale(1.55)}
+.ping {transform-box: fill-box; transform-origin: center; animation: ping .9s var(--ease) forwards}
+@keyframes ping {from {opacity: .9; transform: scale(.4)} to {opacity: 0; transform: scale(3.2)}}
+.valore {display: flex; align-items: baseline; gap: 10px; margin-top: -6px}
+.idx {font-family: var(--f-titoli); font-size: 50px; font-weight: 700; letter-spacing: -0.045em; line-height: 1}
+.idx-sub {font-size: 12px; color: #9fb0d6; line-height: 1.35}
+.estremi {display: flex; justify-content: space-between; font-size: 11px; color: #9fb0d6; margin-top: -2px}
+.conti {display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 11.5px; color: #9fb0d6}
+.conti b {display: block; font-family: var(--f-titoli); font-size: 20px; letter-spacing: -0.02em}
+.barra {display: flex; height: 6px; border-radius: 999px; overflow: hidden; gap: 2px; background: rgba(255,255,255,.06)}
+.barra i {display: block; height: 100%; width: 0; transition: width .7s var(--ease)}
+#spark {width: 100%; height: 62px; display: block; overflow: visible}
+.msg {font-size: 12.5px; line-height: 1.45; color: #d6def4; min-height: 36px}
+.msg b {color: #fff}
+.svolta {position: absolute; left: 50%; top: 14px; transform: translate(-50%, -20px); opacity: 0; z-index: 5;
+  background: var(--oro); color: var(--abisso); font-weight: 600; font-size: 13px; padding: 7px 14px;
+  border-radius: 999px; box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); transition: opacity .4s, transform .5s var(--molla);
+  pointer-events: none; white-space: nowrap}
+.svolta.su {opacity: 1; transform: translate(-50%, 0)}
+
+/* sismografo del tono: una tacca per ogni frase di politica monetaria lungo il discorso */
+.sismo {margin-top: 14px; position: relative; cursor: pointer}
+.sismo svg {width: 100%; height: 70px; display: block}
+.sismo .etich {display: flex; justify-content: space-between; font-size: 11px; color: #8fa0c8; margin-top: 2px}
+.tacca {transition: fill .5s, opacity .5s}
+#testina {transition: transform .25s linear}
+
+.comandi {display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px}
+.btn {background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.14); border-radius: 10px;
+  padding: 7px 13px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background .15s, border-color .15s}
+.btn:hover {background: rgba(255,255,255,.16)}
+.btn.oro {background: var(--oro); color: var(--abisso); border-color: var(--oro)}
+.btn.oro:hover {background: #ffd83d}
+.velocita {display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #c6d2ee}
+.velocita input {accent-color: var(--oro); width: 120px}
+.spazio {flex: 1}
+
+/* ------------------------------------------------ trascrizione che scorre */
+.sotto {display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; margin-top: 16px; align-items: start}
+.box {background: var(--carta); border: 1px solid var(--bordo); border-radius: 16px; padding: 14px 16px}
+.box h4 {margin: 0 0 8px; font-family: var(--f-titoli); font-size: 17px; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 8px}
+.box h4 .n {margin-left: auto; font-family: 'IBM Plex Sans'; font-size: 12px; font-weight: 500; color: var(--ink-2)}
+#feed {max-height: 330px; overflow-y: auto; scroll-behavior: smooth; padding-right: 4px}
+.r {display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 7px 8px; border-radius: 10px; font-size: 14px;
+  line-height: 1.5; cursor: pointer; transition: background .2s, box-shadow .3s; animation: entra .45s var(--ease) both}
+@keyframes entra {from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: none}}
+.r:hover {background: #f3f5fa}
+.r .tm {font-size: 11.5px; color: var(--ink-2); padding-top: 2px}
+.r.nonpm {color: var(--nonril)}
+.r .tx span.hl {border-radius: 4px; padding: 1px 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone}
+.r.ora {box-shadow: inset 0 0 0 2px var(--oro)}
+.r.passato.ora {box-shadow: none}
+.legenda {display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--ink-2); margin-top: 10px}
+
+/* estremi del discorso finora */
+.estr .e {border-left: 3px solid var(--c); padding: 6px 10px; margin: 6px 0; font-size: 13px; line-height: 1.45;
+  background: color-mix(in srgb, var(--c) 7%, white); border-radius: 0 8px 8px 0; animation: entra .45s var(--ease) both}
+.estr .e small {display: block; color: var(--ink-2); margin-top: 3px; font-size: 11.5px}
+.estr .vuoto {font-size: 13px; color: var(--ink-2)}
+
+/* ------------------------------------------------ verdetto finale */
+#fine {display: none; margin-top: 16px; border-radius: 18px; overflow: hidden; border: 1px solid var(--bordo);
+  background: var(--carta); box-shadow: inset 0 3px 0 var(--oro); animation: entra .6s var(--ease) both}
+#fine .in {display: grid; grid-template-columns: 1fr 1.4fr; gap: 1px; background: var(--bordo)}
+#fine .in > div {background: var(--carta); padding: 18px 22px}
+#fine .lbl {font-size: 13px; color: var(--ink-2); font-weight: 500; margin-bottom: 6px}
+#fine .big {font-family: var(--f-titoli); font-size: 54px; font-weight: 700; letter-spacing: -0.045em; line-height: 1}
+#fine .cls {font-family: var(--f-titoli); font-size: 26px; font-weight: 700; letter-spacing: -0.02em}
+#fine .sub {font-size: 13px; color: var(--ink-2); margin-top: 4px; line-height: 1.5}
+.scala {position: relative; height: 10px; border-radius: 999px; margin: 16px 0 6px;
+  background: linear-gradient(90deg, var(--colomba) 0%, #c3cde0 50%, var(--falco) 100%)}
+.scala .seg {position: absolute; top: -7px; width: 24px; height: 24px; margin-left: -12px; left: 50%;
+  background: url('__STELLINA__') center / contain no-repeat; filter: drop-shadow(0 1px 2px rgba(0,18,51,.45));
+  transition: left 1.4s var(--molla) .3s}
+.scala-lbl {display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-2)}
+.fbarra {display: flex; gap: 2px; border-radius: 8px; overflow: hidden; height: 22px; margin: 12px 0 4px}
+.fbarra div {color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+  white-space: nowrap; overflow: hidden; transition: flex-basis 1s var(--ease)}
+
+@media (max-width: 760px) {
+  .scena, .sotto, #fine .in {grid-template-columns: 1fr}
+  .dida.grande {min-height: 220px}
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {animation: none !important; transition: none !important}
+}
+</style>
+
+<div class="console" id="console">
+  <div class="svolta" id="svolta"></div>
+  <div class="scena">
+    <div class="media" id="media">
+      __MEDIA__
+      <div class="dida __DIDA_CLASSE__" id="dida">
+        <div class="riga1" id="dida-meta"></div>
+        <div class="testo" id="dida-testo"><span class="vuoto">__INVITO__</span></div>
+      </div>
+    </div>
+    <div class="strumenti">
+      <div class="testa in-pausa" id="testa"><span class="vivo"></span><span id="stato">In attesa</span>
+        <span class="orologio" id="orologio">–</span></div>
+      <div class="quadro"><svg viewBox="0 0 300 160" id="quadro" role="img"
+        aria-label="Quadrante dell'indice del discorso da colomba a falco"></svg></div>
+      <div class="estremi"><span><b style="color:var(--colomba-chiaro)">colomba</b> −__GAMMA__</span>
+        <span>+__GAMMA__ <b style="color:var(--falco-chiaro)">falco</b></span></div>
+      <div class="valore"><div class="idx" id="idx" style="color:#5d6f99">0,00</div>
+        <div class="idx-sub" id="cnt">indice del discorso<br>finora</div></div>
+      <div class="conti">
+        <div><b id="n-falco" style="color:var(--falco-chiaro)">0</b>falco</div>
+        <div><b id="n-neutrale" style="color:#c6d2ee">0</b>neutrali</div>
+        <div><b id="n-colomba" style="color:var(--colomba-chiaro)">0</b>colomba</div>
+      </div>
+      <div class="barra"><i id="b-falco" style="background:var(--falco)"></i><i id="b-neutrale"
+        style="background:var(--neutrale)"></i><i id="b-colomba" style="background:var(--colomba)"></i></div>
+      <svg id="spark" viewBox="0 0 300 62" preserveAspectRatio="none"></svg>
+      <div class="msg" id="msg">L'andamento compare dopo le prime frasi di politica monetaria.</div>
+    </div>
+  </div>
+  <div class="sismo" id="sismo" title="Clic per saltare a quel punto del discorso">
+    <svg viewBox="0 0 1000 70" preserveAspectRatio="none" id="sismo-svg"></svg>
+    <div class="etich"><span>__INIZIO_LBL__</span><span>sismografo del tono: tacche in su falco, in giù colomba</span>
+      <span id="fine-lbl">fine</span></div>
+  </div>
+  <div class="comandi">
+    __COMANDI__
+    <span class="spazio"></span>
+    <button class="btn" id="salta">Mostra subito tutto</button>
+  </div>
+</div>
+
+<div class="sotto">
+  <div class="box"><h4>Trascrizione <span class="n" id="n-frasi">0 frasi</span></h4>
+    <div id="feed"></div>
+    <div class="legenda"><span><span class="pill" style="background:var(--falco)">falco</span> verso tassi più alti</span>
+      <span><span class="pill" style="background:var(--colomba)">colomba</span> verso tassi più bassi</span>
+      <span><span class="pill" style="background:var(--neutrale)">neutrale</span></span>
+      <span style="color:var(--nonril)">grigio: non di politica monetaria, escluso</span></div>
+  </div>
+  <div class="box estr"><h4>Finora agli estremi</h4>
+    <div id="estremi"><div class="vuoto">Le frasi più da falco e più da colomba ascoltate fin qui.</div></div>
+  </div>
+</div>
+
+<div id="fine"></div>
+
+<script>
+const D = __DATI__;
+const FIN = __FIN__;
+const VIDEO = __VIDEO__;          // id del video YouTube, oppure null per lo scorrimento del testo
+const GAMMA = __GAMMA_NUM__;      // il quadrante va da −GAMMA a +GAMMA
+const COL = {falco: '__FALCO__', colomba: '__COLOMBA__', neutrale: '__NEUTRALE__'};
+const COL_CHIARO = {falco: '#ff8a7a', colomba: '#7cc8f0', neutrale: '#c6d2ee'};
+const $ = id => document.getElementById(id);
+const fmt = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2).replace('.', ',');
+const mmss = s => { s = Math.max(0, Math.floor(s)); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s % 60).padStart(2, '0'); };
+const etichettaTempo = d => VIDEO ? mmss(d.t) : 'n. ' + (d.i + 1);
+const mix = (a, b, t) => { const p = h => [1, 3, 5].map(k => parseInt(h.slice(k, k + 2), 16));
+  const x = p(a), y = p(b); return 'rgb(' + x.map((v, k) => Math.round(v + (y[k] - v) * t)).join(',') + ')'; };
+D.forEach((d, i) => d.i = i);
+// l'iframe di Streamlit prende l'altezza del contenuto (niente doppia barra di scorrimento)
+try { const fe = window.frameElement;
+  if (fe) new ResizeObserver(() => {
+    const h = (document.body.scrollHeight + 4) + 'px';
+    fe.style.height = h;
+    if (fe.parentElement) fe.parentElement.style.height = h;   // il contenitore di Streamlit ha un'altezza fissa
+  }).observe(document.body);
+} catch (e) {}
+const PM_TUTTE = D.filter(d => d.pm);
+
+/* ------------------------------------------------ quadrante a 12 stelle */
+const NS = 'http://www.w3.org/2000/svg';
+function stella(cx, cy, R) {
+  const p = []; for (let i = 0; i < 10; i++) { const r = i % 2 ? R * .382 : R, a = -Math.PI / 2 + i * Math.PI / 5;
+    p.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); } return p.join(' ');
+}
+const stelle = [];
+(function costruisciQuadro() {
+  const q = $('quadro'), cx = 150, cy = 150, R = 124;
+  let h = '<defs><linearGradient id="arco" x1="0" x2="1"><stop offset="0" stop-color="' + COL.colomba +
+    '"/><stop offset=".5" stop-color="#c3cde0"/><stop offset="1" stop-color="' + COL.falco + '"/></linearGradient>' +
+    '<filter id="alone" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.6" result="b"/>' +
+    '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+  h += '<path d="M ' + (cx - R + 20) + ' ' + cy + ' A ' + (R - 20) + ' ' + (R - 20) + ' 0 0 1 ' + (cx + R - 20) + ' ' + cy +
+    '" fill="none" stroke="url(#arco)" stroke-width="3" stroke-linecap="round" opacity=".9"/>';
+  for (let j = 0; j <= 8; j++) { const a = Math.PI - j * Math.PI / 8, r1 = j % 4 ? R - 30 : R - 27, r2 = j % 4 ? R - 35 : R - 38;
+    h += '<line x1="' + (cx + r1 * Math.cos(a)).toFixed(1) + '" y1="' + (cy - r1 * Math.sin(a)).toFixed(1) + '" x2="' +
+      (cx + r2 * Math.cos(a)).toFixed(1) + '" y2="' + (cy - r2 * Math.sin(a)).toFixed(1) +
+      '" stroke="rgba(255,255,255,.35)" stroke-width="1.4" stroke-linecap="round"/>'; }
+  h += '<g id="pings"></g>';
+  h += '<g id="ago"><line x1="150" y1="150" x2="150" y2="' + (cy - R + 42) + '" stroke="__ORO__" stroke-width="3" ' +
+    'stroke-linecap="round"/><circle cx="150" cy="' + (cy - R + 42) + '" r="3.5" fill="__ORO__"/></g>';
+  h += '<circle cx="150" cy="150" r="9" fill="__ABISSO__" stroke="__ORO__" stroke-width="2.5"/>';
+  for (let i = 0; i < 12; i++) { const a = Math.PI - i * Math.PI / 11, t = i / 11;
+    const c = t <= .5 ? mix(COL.colomba, '#c3cde0', t * 2) : mix('#c3cde0', COL.falco, (t - .5) * 2);
+    h += '<polygon class="st" data-c="' + c + '" fill="' + c + '" points="' +
+      stella(cx + R * Math.cos(a), cy - R * Math.sin(a), 10) + '"/>'; }
+  q.innerHTML = h;
+  q.querySelectorAll('.st').forEach(s => stelle.push(s));
+})();
+let stellaAccesa = -1;
+function muoviAgo(v) {
+  const f = Math.min(1, Math.max(0, (v + GAMMA) / (2 * GAMMA)));
+  $('ago').style.transform = 'rotate(' + (f * 180 - 90).toFixed(1) + 'deg)';
+  const k = Math.round(f * 11);
+  if (k !== stellaAccesa) {
+    if (stellaAccesa >= 0) { const s = stelle[stellaAccesa]; s.classList.remove('acceso'); s.setAttribute('fill', s.dataset.c); s.removeAttribute('filter'); }
+    const s = stelle[k]; s.classList.add('acceso'); s.setAttribute('fill', '__ORO__'); s.setAttribute('filter', 'url(#alone)');
+    stellaAccesa = k;
+  }
+}
+function ping(classe) {
+  const c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 150); c.setAttribute('cy', 150); c.setAttribute('r', 12); c.setAttribute('fill', 'none');
+  c.setAttribute('stroke', COL[classe]); c.setAttribute('stroke-width', 2); c.setAttribute('class', 'ping');
+  $('pings').appendChild(c); setTimeout(() => c.remove(), 1000);
+}
+
+/* ------------------------------------------------ numeri che scorrono */
+let idxMostrato = 0, animIdx = null;
+function tweenIdx(a) {
+  const da = idxMostrato, t0 = performance.now(), dur = 650;
+  cancelAnimationFrame(animIdx);
+  const passo = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    idxMostrato = da + (a - da) * e; $('idx').textContent = fmt(idxMostrato);
+    $('idx').style.color = idxMostrato > 0.02 ? COL_CHIARO.falco : (idxMostrato < -0.02 ? COL_CHIARO.colomba : '#fff');
+    if (k < 1) animIdx = requestAnimationFrame(passo); };
+  animIdx = requestAnimationFrame(passo);
+}
+
+/* ------------------------------------------------ sismografo */
+let durata = VIDEO ? Math.max(1, (D.length ? D[D.length - 1].t : 0) + 15) : Math.max(1, D.length);
+function costruisciSismo() {
+  let h = '<line x1="0" y1="35" x2="1000" y2="35" stroke="rgba(255,255,255,.18)" stroke-width="1"/>';
+  PM_TUTTE.forEach(d => {
+    const x = (d.t / durata * 1000).toFixed(1), alt = 5 + 27 * Math.abs(d.pc), su = d.pc >= 0;
+    h += '<rect class="tacca" id="tk' + d.i + '" x="' + x + '" width="3" y="' + (su ? 35 - alt : 35).toFixed(1) +
+      '" height="' + alt.toFixed(1) + '" rx="1" fill="rgba(255,255,255,.13)"><title>' + etichettaTempo(d) + '</title></rect>';
+  });
+  h += '<g id="testina" style="transform:translateX(0px)"><rect x="-1" y="0" width="2.5" height="70" fill="__ORO__"/>' +
+    '<circle cx="0.25" cy="3" r="4" fill="__ORO__"/></g>';
+  $('sismo-svg').innerHTML = h;
+  $('fine-lbl').textContent = VIDEO ? mmss(durata) : D.length + ' frasi';
+}
+costruisciSismo();
+function testina(pos) { $('testina').style.transform = 'translateX(' + Math.min(1000, pos / durata * 1000).toFixed(1) + 'px)'; }
+
+/* ------------------------------------------------ disegno di tutto fino alla frase n */
+let mostrate = 0, finito = false;
+function rigaFeed(d, animata) {
+  const r = document.createElement('div');
+  r.className = 'r' + (d.pm ? '' : ' nonpm'); r.dataset.i = d.i;
+  if (!animata) r.style.animation = 'none';
+  const tx = document.createElement('div'); tx.className = 'tx';
+  const s = document.createElement('span'); s.textContent = d.testo;
+  if (d.pm) { s.className = 'hl'; s.style.background = d.bg; s.title = d.classe + ', punteggio ' + fmt(d.pc) +
+    ', sicurezza ' + Math.round(d.sic * 100) + '%'; }
+  tx.appendChild(s);
+  r.innerHTML = '<div class="tm">' + etichettaTempo(d) + '</div>'; r.appendChild(tx);
+  r.onclick = () => vaiA(d);
+  return r;
+}
+function didascalia(d) {
+  const box = $('dida');
+  box.classList.toggle('nonpm', !d.pm);
+  box.style.setProperty('--c', d.pm ? COL[d.classe] : 'rgba(255,255,255,.15)');
+  box.style.background = d.pm ? 'color-mix(in srgb, ' + COL[d.classe] + ' ' + Math.round(6 + 16 * d.sic) + '%, rgba(255,255,255,.04))' : '';
+  $('dida-meta').innerHTML = '<span>' + etichettaTempo(d) + '</span>' + (d.pm ?
+    '<span class="pill" style="background:' + COL[d.classe] + '">' + d.classe + '</span><span class="triade" title="probabilità: falco, neutrale, colomba">' +
+    '<i style="width:' + (d.pf * 100) + '%;background:' + COL.falco + '"></i><i style="width:' + (d.pn * 100) + '%;background:' + COL.neutrale +
+    '"></i><i style="width:' + (d.pco * 100) + '%;background:' + COL.colomba + '"></i></span><span>sicurezza ' +
+    Math.round(d.sic * 100) + '%</span>' : '<span>non di politica monetaria, esclusa dal punteggio</span>');
+  const t = $('dida-testo'); t.innerHTML = '';
+  d.testo.split(/(\s+)/).forEach((w, k) => { const s = document.createElement('span'); s.className = 'parola';
+    s.textContent = w; s.style.animationDelay = Math.min(k, 80) * 9 + 'ms'; t.appendChild(s); });
+}
+function estremi(pm) {
+  if (!pm.length) return;
+  const ord = [...pm].sort((a, b) => b.pc - a.pc);
+  const scegli = [...ord.slice(0, 2).filter(d => d.pc > 0.2), ...ord.slice(-2).reverse().filter(d => d.pc < -0.2)];
+  const chiave = scegli.map(d => d.i).join(',');
+  if ($('estremi').dataset.k === chiave) return;
+  $('estremi').dataset.k = chiave;
+  $('estremi').innerHTML = scegli.length ? scegli.map(d => '<div class="e" style="--c:' + COL[d.classe] + '">' +
+    d.testo.replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c])) +
+    '<small>' + d.classe + ', punteggio ' + fmt(d.pc) + ', ' + etichettaTempo(d) + '</small></div>').join('')
+    : '<div class="vuoto">Ancora nessuna frase netta in un senso o nell\'altro.</div>';
+}
+function spark(serie) {
+  if (serie.length < 2) { $('spark').innerHTML = ''; return; }
+  const W = 300, H = 62, y0 = H / 2, k = (H / 2 - 4);
+  const pts = serie.map((v, i) => [i * W / (serie.length - 1), y0 - Math.max(-1, Math.min(1, v / GAMMA)) * k]);
+  const linea = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const area = 'M0,' + y0 + ' L' + linea.split(' ').join(' L') + ' L' + W + ',' + y0 + ' Z';
+  const u = pts[pts.length - 1];
+  $('spark').innerHTML = '<defs><clipPath id="sopra"><rect x="0" y="0" width="300" height="' + y0 + '"/></clipPath>' +
+    '<clipPath id="sotto"><rect x="0" y="' + y0 + '" width="300" height="' + y0 + '"/></clipPath></defs>' +
+    '<path d="' + area + '" fill="rgba(210,64,47,.35)" clip-path="url(#sopra)"/>' +
+    '<path d="' + area + '" fill="rgba(30,149,208,.38)" clip-path="url(#sotto)"/>' +
+    '<line x1="0" y1="' + y0 + '" x2="300" y2="' + y0 + '" stroke="rgba(255,255,255,.25)" stroke-dasharray="3 3"/>' +
+    '<polyline points="' + linea + '" fill="none" stroke="#dbe5ff" stroke-width="2" vector-effect="non-scaling-stroke"/>' +
+    '<circle cx="' + u[0].toFixed(1) + '" cy="' + u[1].toFixed(1) + '" r="3.5" fill="__ORO__"/>';
+}
+let segnoPrima = 0, timerSvolta = null;
+function avvisoSvolta(testo) {
+  const s = $('svolta'); s.textContent = testo; s.classList.add('su');
+  clearTimeout(timerSvolta); timerSvolta = setTimeout(() => s.classList.remove('su'), 3200);
+}
+function disegna(n, animata = true) {
+  n = Math.max(0, Math.min(D.length, n));
+  if (n === mostrate) return;
+  const feed = $('feed');
+  const inFondo = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 60;
+  if (n < mostrate) {                   // si è tornati indietro nel video: si ridisegna da capo
+    feed.innerHTML = ''; mostrate = 0; animata = false; segnoPrima = 0;
+    PM_TUTTE.forEach(d => { const t = $('tk' + d.i); if (t) t.setAttribute('fill', 'rgba(255,255,255,.13)'); });
+  }
+  const vecchia = feed.querySelector('.r.ora'); if (vecchia) vecchia.classList.remove('ora');
+  const tanti = n - mostrate > 25;
+  for (let i = mostrate; i < n; i++) {
+    const d = D[i]; feed.appendChild(rigaFeed(d, animata && !tanti));
+    if (d.pm) { const t = $('tk' + i); if (t) t.setAttribute('fill', COL[d.classe]); }
+  }
+  const nuovePm = D.slice(mostrate, n).filter(d => d.pm);
+  mostrate = n;
+  if (feed.lastChild) feed.lastChild.classList.add('ora');
+  if (inFondo || !animata) feed.scrollTop = feed.scrollHeight;
+  $('n-frasi').textContent = n + ' di ' + D.length + ' frasi';
+  if (n > 0) didascalia(D[n - 1]);
+  const pm = D.slice(0, n).filter(d => d.pm);
+  const c = {falco: 0, colomba: 0, neutrale: 0}; pm.forEach(d => c[d.classe]++);
+  ['falco', 'neutrale', 'colomba'].forEach(k => { $('n-' + k).textContent = c[k];
+    $('b-' + k).style.width = (pm.length ? c[k] / pm.length * 100 : 0) + '%'; });
+  if (!pm.length) return;
+  let somma = 0; const serie = pm.map((d, i) => (somma += d.p) / (i + 1));
+  const idx = serie[serie.length - 1];
+  tweenIdx(idx); muoviAgo(idx); spark(serie); estremi(pm);
+  if (animata && nuovePm.length) ping(nuovePm[nuovePm.length - 1].classe);
+  $('cnt').innerHTML = 'indice del discorso<br>su ' + pm.length + ' frasi di politica monetaria';
+  if (pm.length >= 12) {
+    const ult = pm.slice(-10).reduce((a, d) => a + d.p, 0) / 10, diff = ult - idx;
+    $('msg').innerHTML = Math.abs(diff) >= 0.1 ? 'Le ultime 10 frasi sono <b>più da ' + (diff > 0 ? 'falco' : 'colomba') +
+      '</b> della media del discorso (' + fmt(ult) + ').' : 'Le ultime 10 frasi sono in linea con il resto del discorso.';
+  } else {
+    $('msg').textContent = 'Servono almeno 12 frasi di politica monetaria per confrontare l\'andamento (' + pm.length + ' finora).';
+  }
+  const segno = idx > 0.05 ? 1 : (idx < -0.05 ? -1 : 0);
+  if (animata && pm.length >= 5 && segno && segnoPrima && segno !== segnoPrima)
+    avvisoSvolta(segno > 0 ? 'Svolta: il tono passa dal lato colomba al lato falco' : 'Svolta: il tono passa dal lato falco al lato colomba');
+  if (segno) segnoPrima = segno;
+}
+
+/* ------------------------------------------------ verdetto */
+function mostraFine() {
+  if (finito) return; finito = true; disegna(D.length, false); statoOnda(false, 'Concluso');
+  const f = $('fine');
+  if (!FIN) { f.innerHTML = '<div style="padding:18px 22px">Nessuna frase di politica monetaria: non c\'è un punteggio da calcolare.</div>';
+    f.style.display = 'block'; return; }
+  f.innerHTML = '<div class="in"><div><div class="lbl">Il verdetto: punteggio finale</div><div class="big" id="fin-big">' +
+    fmt(0) + '</div><div class="sub">' + FIN.n + ' frasi di politica monetaria su ' + D.length + '</div>' + FIN.barra + '</div>' +
+    '<div><div class="lbl">Rispetto ai discorsi BCE dal 2018</div><div class="cls" style="color:' + FIN.colore + '">' + FIN.classe +
+    '</div><div class="sub">più da falco del <b>' + FIN.pct + '%</b> dei discorsi</div>' +
+    '<div class="scala"><div class="seg" id="fin-seg"></div></div><div class="scala-lbl"><span>più colomba</span>' +
+    '<span>nella media</span><span>più falco</span></div><div class="sub" style="margin-top:10px">Rispetto al ' + FIN.trim +
+    '; rispetto agli ultimi 10 discorsi: ' + FIN.recenti + '.</div></div></div>';
+  f.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => { $('fin-seg').style.left = FIN.pos + '%'; }));
+  const t0 = performance.now();
+  const conta = now => { const k = Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - k, 3);
+    $('fin-big').textContent = fmt(FIN.valore * e); $('fin-big').style.color = FIN.valore > 0 ? COL.falco : COL.colomba;
+    if (k < 1) requestAnimationFrame(conta); };
+  requestAnimationFrame(conta);
+  setTimeout(() => f.scrollIntoView({behavior: 'smooth', block: 'nearest'}), 200);
+}
+$('salta').onclick = mostraFine;
+function statoOnda(attivo, testo) {
+  $('testa').className = 'testa ' + (attivo ? 'in-onda' : 'in-pausa'); $('stato').textContent = testo;
+}
+
+/* ------------------------------------------------ orologio: video YouTube oppure scorrimento simulato */
+let vaiA = () => {};
+if (VIDEO) {
+  let player = null;
+  const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+  window.onYouTubeIframeAPIReady = () => {
+    player = new YT.Player('player', {videoId: VIDEO, playerVars: {rel: 0, modestbranding: 1},
+      events: {onReady: () => { const dd = player.getDuration(); if (dd > 0) { durata = dd; costruisciSismo(); } },
+               onStateChange: ev => { if (ev.data === 1) statoOnda(true, 'In diretta');
+                 else if (ev.data === 2) statoOnda(false, 'In pausa');
+                 else if (ev.data === 0) mostraFine(); }}});
+  };
+  vaiA = d => { if (player && player.seekTo) { player.seekTo(Math.max(0, d.t - 0.2), true); player.playVideo(); } };
+  $('sismo').onclick = ev => { if (!player || !player.seekTo) return; const r = ev.currentTarget.getBoundingClientRect();
+    player.seekTo((ev.clientX - r.left) / r.width * durata, true); player.playVideo(); };
+  setInterval(() => {
+    if (!player || !player.getCurrentTime) return;
+    const t = player.getCurrentTime(); testina(t); $('orologio').textContent = mmss(t) + ' / ' + mmss(durata);
+    let n = 0; while (n < D.length && D[n].t <= t) n++;
+    if (finito && n < mostrate) finito = false;      // riavvolto dopo la fine: si riprende a seguire il video
+    if (!finito) disegna(n);
+  }, 250);
+} else {
+  let pos = 0, vel = __VELOCITA__, attivo = true, ultimo = performance.now();
+  const bottone = $('play');
+  const aggiornaBottone = () => { bottone.textContent = attivo ? 'Pausa' : (pos >= D.length ? 'Ricomincia' : 'Riprendi'); };
+  bottone.onclick = () => { if (pos >= D.length) { pos = 0; finito = false; $('fine').style.display = 'none'; disegna(0, false); }
+    attivo = !attivo; ultimo = performance.now(); aggiornaBottone(); statoOnda(attivo, attivo ? 'In scorrimento' : 'In pausa'); };
+  $('vel').oninput = ev => { vel = +ev.target.value; $('vel-n').textContent = vel; };
+  vaiA = d => { pos = d.i + 0.999; disegna(d.i + 1, false); testina(pos); };
+  $('sismo').onclick = ev => { const r = ev.currentTarget.getBoundingClientRect();
+    pos = (ev.clientX - r.left) / r.width * D.length; finito = false; $('fine').style.display = 'none'; disegna(Math.floor(pos)); };
+  statoOnda(true, 'In scorrimento'); aggiornaBottone();
+  const giro = now => {
+    const dt = Math.min(0.25, (now - ultimo) / 1000); ultimo = now;
+    if (attivo && !finito) {
+      pos = Math.min(D.length, pos + vel * dt);
+      disegna(Math.min(D.length, Math.ceil(pos)));
+      testina(pos); $('orologio').textContent = 'frase ' + Math.min(D.length, Math.ceil(pos)) + ' di ' + D.length;
+      if (pos >= D.length) { attivo = false; aggiornaBottone(); mostraFine(); }
+    }
+    requestAnimationFrame(giro);
+  };
+  requestAnimationFrame(giro);
+}
+</script>

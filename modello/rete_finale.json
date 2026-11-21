@@ -1,0 +1,55 @@
+{
+  "modello_embedding": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "classi": [
+    "dovish (colomba)",
+    "hawkish (falco)",
+    "neutral (neutrale)"
+  ],
+  "rete": "StandardScaler + MLPClassifier(100, relu, adam, alpha=1, max_iter=500, random_state=1)",
+  "addestramento": "Fed 2.339 + WCB 976 frasi",
+  "verifica_test_F1_pesato": {
+    "A": {
+      "seme_1": 0.564,
+      "media_10_semi": 0.566,
+      "dev_st_10_semi": 0.021,
+      "orange": 0.592
+    },
+    "B": {
+      "seme_1": 0.612,
+      "media_10_semi": 0.615,
+      "dev_st_10_semi": 0.012,
+      "orange": 0.633,
+      "matrice_seme_1": [
+        [
+          39,
+          16,
+          13
+        ],
+        [
+          15,
+          50,
+          14
+        ],
+        [
+          17,
+          20,
+          60
+        ]
+      ],
+      "accuratezza_seme_1": 0.611,
+      "kappa_seme_1": 0.413,
+      "f1_per_classe_seme_1": [
+        0.561,
+        0.606,
+        0.652
+      ]
+    },
+    "B2": {
+      "seme_1": 0.603,
+      "media_10_semi": 0.603,
+      "dev_st_10_semi": 0.01,
+      "orange": 0.611
+    }
+  },
+  "creato": "2026-11-20 15:26"
+}

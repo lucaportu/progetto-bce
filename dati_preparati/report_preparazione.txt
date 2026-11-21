@@ -1,0 +1,73 @@
+Discorsi nel file: 3086; con testo: 2914
+Discorsi non in inglese (esclusi dal file di politica monetaria): 157
+Frasi tenute: 346464; di politica monetaria: 60764 (17.5%)
+
+Frasi scartate:
+  meno di 5 parole: 20699
+  nota a piè di pagina: 18494
+  riferimento bibliografico: 15343
+  titoletto senza punteggiatura finale: 4063
+  duplicata nello stesso discorso: 490
+  più di 100 parole: 165
+  resto dell'intestazione: 17
+
+Frasi di politica monetaria per trimestre dal 2018: min 105, mediana 499, max 952 (36 trimestri)
+
+Frasi di politica monetaria per oratore:
+  Jean-Claude Trichet: 5313
+  Willem F. Duisenberg: 4638
+  Philip R. Lane: 4432
+  Isabel Schnabel: 4296
+  Mario Draghi: 4143
+  Peter Praet: 4138
+  Otmar Issing: 3548
+  Benoît Cœuré: 3434
+  Christine Lagarde: 3098
+  Lorenzo Bini Smaghi: 2782
+  Vítor Constâncio: 2650
+  Lucas Papademos: 2506
+  Jürgen Stark: 2335
+  José Manuel González-Páramo: 2027
+  Yves Mersch: 1988
+  Christian Noyer: 1544
+  Luis de Guindos: 1408
+  Fabio Panetta: 1282
+  Sirkka Hämäläinen: 990
+  Eugenio Domingo Solans: 912
+  Gertrude Tumpel-Gugerell: 741
+  Sabine Lautenschläger: 739
+  Frank Elderson: 453
+  Piero Cipollone: 435
+  Tommaso Padoa-Schioppa: 360
+  Jörg Asmussen: 267
+  Alexandre Lamfalussy: 189
+  Christine Lagarde,Philip R. Lane: 80
+  Boris Vujčić: 33
+  Willem F. Duisenberg,Eugenio Domingo Solans: 3
+
+Parole chiave più frequenti:
+  monetary policy: 21786
+  inflation: 19637
+  price stability: 9888
+  interest rates: 5984
+  interest rate: 2924
+  governing council: 2143
+  inflationary: 1574
+  transmission: 1286
+  tightening: 1205
+  financing conditions: 1161
+  asset purchases: 1142
+  HICP: 985
+  policy rates: 971
+  forward guidance: 905
+  transmission of monetary policy: 745
+  accommodative: 692
+  wage: 681
+  transmission mechanism: 660
+  APP: 617
+  policy rate: 586
+  asset purchase: 563
+  deflation: 554
+  disinflation: 457
+  deposit facility: 449
+  price pressures: 439

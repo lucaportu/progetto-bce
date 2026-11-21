@@ -1,0 +1,39 @@
+trimestre	anno_decimale	tasso_DFR_fine	variazione_t	variazione_t+1	variazione_t+2	variazione_t+3	decisione_t+1	regola_banale_t+1
+d	c	c	c	c	c	c	d	d
+meta							meta	meta
+2018-T1	2018.125	-0.4	0.0	0.0	0.0	0.0	fermo	fermo
+2018-T2	2018.375	-0.4	0.0	0.0	0.0	0.0	fermo	fermo
+2018-T3	2018.625	-0.4	0.0	0.0	0.0	0.0	fermo	fermo
+2018-T4	2018.875	-0.4	0.0	0.0	0.0	-0.1	fermo	fermo
+2019-T1	2019.125	-0.4	0.0	0.0	-0.1	0.0	fermo	fermo
+2019-T2	2019.375	-0.4	0.0	-0.1	0.0	0.0	taglio	fermo
+2019-T3	2019.625	-0.5	-0.1	0.0	0.0	0.0	fermo	taglio
+2019-T4	2019.875	-0.5	0.0	0.0	0.0	0.0	fermo	taglio
+2020-T1	2020.125	-0.5	0.0	0.0	0.0	0.0	fermo	taglio
+2020-T2	2020.375	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2020-T3	2020.625	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2020-T4	2020.875	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2021-T1	2021.125	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2021-T2	2021.375	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2021-T3	2021.625	-0.5	0.0	0.0	0.0	0.0	fermo	fermo
+2021-T4	2021.875	-0.5	0.0	0.0	0.0	1.25	fermo	fermo
+2022-T1	2022.125	-0.5	0.0	0.0	1.25	1.25	fermo	fermo
+2022-T2	2022.375	-0.5	0.0	1.25	1.25	1.0	rialzo	fermo
+2022-T3	2022.625	0.75	1.25	1.25	1.0	0.5	rialzo	rialzo
+2022-T4	2022.875	2.0	1.25	1.0	0.5	0.5	rialzo	rialzo
+2023-T1	2023.125	3.0	1.0	0.5	0.5	0.0	rialzo	rialzo
+2023-T2	2023.375	3.5	0.5	0.5	0.0	0.0	rialzo	rialzo
+2023-T3	2023.625	4.0	0.5	0.0	0.0	-0.25	fermo	rialzo
+2023-T4	2023.875	4.0	0.0	0.0	-0.25	-0.25	fermo	rialzo
+2024-T1	2024.125	4.0	0.0	-0.25	-0.25	-0.5	taglio	rialzo
+2024-T2	2024.375	3.75	-0.25	-0.25	-0.5	-0.5	taglio	taglio
+2024-T3	2024.625	3.5	-0.25	-0.5	-0.5	-0.5	taglio	taglio
+2024-T4	2024.875	3.0	-0.5	-0.5	-0.5	0.0	taglio	taglio
+2025-T1	2025.125	2.5	-0.5	-0.5	0.0	0.0	taglio	taglio
+2025-T2	2025.375	2.0	-0.5	0.0	0.0	0.0	fermo	taglio
+2025-T3	2025.625	2.0	0.0	0.0	0.0	0.25	fermo	taglio
+2025-T4	2025.875	2.0	0.0	0.0	0.25	0.25	fermo	taglio
+2026-T1	2026.125	2.0	0.0	0.25	0.25		rialzo	fermo
+2026-T2	2026.375	2.25	0.25	0.25			rialzo	rialzo
+2026-T3	2026.625	2.5	0.25					rialzo
+2026-T4	2026.875							rialzo

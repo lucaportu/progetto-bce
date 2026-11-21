@@ -1,0 +1,37 @@
+# Tema "Eurosistema": blu della bandiera europea, blu abisso per barra laterale e testate, oro delle stelle solo
+# per gli accenti, fondo carta fredda. Caratteri: Bricolage Grotesque (titoli e numeri) + IBM Plex Sans (testo).
+[theme]
+base = "light"
+primaryColor = "#003399"
+backgroundColor = "#f3f5fa"
+secondaryBackgroundColor = "#e7ecf6"
+textColor = "#0b1b3f"
+borderColor = "#dde3ef"
+linkColor = "#003399"
+baseRadius = "12px"
+buttonRadius = "10px"
+font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+headingFont = "Bricolage Grotesque:https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&display=swap"
+headingFontWeights = [700, 700, 700, 600, 600, 600]
+metricValueFontWeight = 700
+chartCategoricalColors = ["#003399", "#a87800", "#d2402f", "#1e95d0", "#8a94aa"]
+blueColor = "#003399"
+redColor = "#d2402f"
+yellowColor = "#a87800"
+showWidgetBorder = true
+
+[theme.sidebar]
+backgroundColor = "#001233"
+secondaryBackgroundColor = "#0a2456"
+textColor = "#e8eefc"
+borderColor = "#132c5e"
+primaryColor = "#ffcc00"
+
+[client]
+toolbarMode = "minimal"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false

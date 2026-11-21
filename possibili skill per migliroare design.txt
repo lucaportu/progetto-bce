@@ -1,0 +1,37 @@
+Per realizzare siti web e dashboard con un design di livello molto alto (evitando l'effetto "template generico" o il tipico AI slop con i soliti gradienti standard), puoi combinare due tipi di risorse su GitHub: Agent Skills(istruzioni SKILL.md per Claude Code, Cursor, Codex, ecc.) e Repository UI / Design System di ultima generazione.
+
+1. Agent Skills per AI Coding Assistant (Claude Code, Cursor, Codex)
+Queste skill forniscono all'AI regole di art direction, tipografia, teoria del colore e micro-interazioni prima ancora che inizi a scrivere codice:
+
+	•	anthropics/skills (frontend-design)
+	◦	Cosa fa: È la skill ufficiale di Anthropic progettata per eliminare le interfacce generiche. Obbliga l'agente a scegliere una direzione estetica precisa (es. editoriale, brutalista, minimal, luxury) e a definire tipografia e gerarchia visiva prima di generare componenti.
+	◦	Installazione rapida: npx skills add anthropics/skills --skill frontend-design
+	•	nextlevelbuilder/ui-ux-pro-max-skill
+	◦	Cosa fa: Uno dei repository di skill più popolari su GitHub. Integra un database locale ricercabile con oltre 190 palette colori divise per settore (fintech, SaaS, medical, creative, ecc.), 70+ abbinamenti tipografici, regole di spaziatura e liste di anti-pattern da evitare per oltre 20 stack (React, Next.js, Vue, Tailwind, SwiftUI, Flutter).
+	•	Leonxlnx/taste-skill
+	◦	Cosa fa: Una suite di skill (design-taste-frontend, minimalist-ui, high-end-visual-design) basata su vincoli metrici precisi su layout, animazioni e spaziature. Include anche una skill (redesign-existing-projects) ottima per analizzare un progetto esistente e rifarlo sezione per sezione.
+	•	superdesigndev/superdesign-skill e Moddingflow/better-design
+	◦	Cosa fanno: Guidano l'agente nella creazione di un vero e proprio file DESIGN.md / design token coerenti, nella gestione del motion design e nella validazione dell'interfaccia su Claude Code, Cursor e Codex.
+2. Repository UI per Siti Web, Landing Page e Micro-interazioni
+Per ottenere l'estetica moderna tipica dei siti di prodotti tech (Linear, Vercel, Stripe), il codice viene copiato direttamente nel progetto anziché installato come pacchetto rigido:
+
+	•	shadcn-ui/ui
+	◦	Perché usarlo: È la base standard per qualsiasi design system moderno su React e Tailwind CSS v4 (con supporto a Base UI, Radix o React Aria). Ti dà il controllo totale su ogni riga di codice e stile.
+	•	magicuidesign/magicui
+	◦	Perché usarlo: Pensato per Design Engineers, offre decine di componenti animati ad altissimo impatto visivo (Bento Grid, globi 3D interattivi, Marquee, pulsanti shimmer, sfondi particellari). Bonus:all'interno del repo (cartella skills/magic-ui) include già una SKILL.md ufficiale per farli integrare correttamente agli agenti AI.
+	•	ibelick/motion-primitives
+	◦	Perché usarlo: Una libreria open-source di componenti animati estremamente raffinati e minimalisti (effetti di rivelazione testo, cursori magnetici, dialoghi morphing) costruiti su Motion e Tailwind CSS.
+3. Repository specifici per Dashboard di livello Enterprise
+Se il focus è su applicazioni gestionali, pannelli analitici o SaaS B2B:
+	•	satnaing/shadcn-admin
+	◦	Perché usarlo: Uno dei template open-source più curati su GitHub. Realizzato con Shadcn UI, Vite, React e Tailwind, include tabelle avanzate con filtri e paginazione, layout responsivi, supporto RTL e un'ottima gestione dell'accessibilità.
+	•	arhamkhnz/next-shadcn-admin-dashboard (disponibile anche per TanStack Start)
+	◦	Perché usarlo: Basato su Next.js 16, Tailwind CSS v4 e Shadcn UI, offre schermate già pronte per CRM, Finance e Analytics, oltre a preset di temi selezionabili al volo (Minimal/Neutral, Neo Brutalism, Soft Pop, Tangerine).
+	•	tremor (tremor.so / repository Tremor)
+	◦	Perché usarlo: Il punto di riferimento open-source su React e Tailwind per data visualization e dashboard: KPI card, sparkline, grafici complessi e filtri multi-logica con un'estetica pulitissima e pronta per la produzione.
+	•	BoardUI/boardui
+	◦	Perché usarlo: Design system basato su React Aria e Tailwind CSS v4 con componenti e layout specifici per dashboard moderne e interfacce AI/multi-agente.
+💡 Workflow consigliato per il massimo risultato
+	1	Parti da una base solida: Clona satnaing/shadcn-admin (per una dashboard) oppure inizializza un progetto Next.js + shadcn/ui (per un sito/SaaS).
+	2	Installa le skill nell'editor: Aggiungi frontend-design (di Anthropic) + ui-ux-pro-max-skill (per palette e font).
+	3	Arricchisci i punti focali: Usa magicui o motion-primitives solo per le sezioni chiave (Hero, Bento Grid, KPI principali), chiedendo all'AI di seguire rigorosamente le regole delle skill installate.
