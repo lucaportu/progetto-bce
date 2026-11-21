@@ -180,7 +180,8 @@ STILE = f"""
   --falco: {FALCO}; --colomba: {COLOMBA}; --neutrale: {NEUTRALE};
   --f-titoli: {F_TITOLI}; --f-testo: {F_TESTO};
 }}
-.block-container {{max-width: 1200px; padding-top: 1.4rem; padding-bottom: 2rem;}}
+/* in alto: 3.75rem è la barra di Streamlit (logo, menu e, su Streamlit Cloud, "Fork"), che copre il contenuto */
+.block-container {{max-width: 1200px; padding-top: calc(3.75rem + 1.2rem); padding-bottom: 2rem;}}
 h1, h2, h3, h4 {{font-family: var(--f-titoli); letter-spacing: -0.02em;}}
 .stApp {{font-variant-numeric: tabular-nums;}}
 [data-testid="stSidebar"] {{background-image: radial-gradient(120% 60% at 0% 0%, rgba(0,51,153,.55), rgba(0,18,51,0) 60%);}}
